@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:futurex/screens/bot_screens/gemini.dart';
 
 class BotSelectionPage extends StatelessWidget {
   @override
@@ -30,7 +31,7 @@ class BotSelectionPage extends StatelessWidget {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            // Handle the action for selecting Bard
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => Chatscreen()));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
