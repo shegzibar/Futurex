@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "826402051210",
+    "project_id": "futurex-19db0",
+    "storage_bucket": "futurex-19db0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:826402051210:android:f1cad09a3cd64260f30973",
+        "android_client_info": {
+          "package_name": "com.example.futurex"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6cP0weJdtHSiMZXJxXnQziXweSzx25s4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -37,6 +37,10 @@ dependencies:
   cupertino_icons: ^1.0.6
   table_calendar: ^3.0.2
   shared_preferences:
+  google_generative_ai:
+  firebase_auth:
+  cloud_firestore:
+  firebase_core:
 
 dev_dependencies:
   flutter_test:

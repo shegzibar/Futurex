@@ -1,14 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:futurex/screens/navbar.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController studentIndexController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  // Function to authenticate user by checking Firestore
+  Future<void> authenticateUser(BuildContext context) async {
+    String studentIndex = studentIndexController.text;
+    String password = passwordController.text;
+
+    if (studentIndex.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    try {
+      // Fetch the document from Firestore where studentIndex matches
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('index', isEqualTo: studentIndex)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Invalid student index or password')),
+        );
+        return;
+      }
+
+      // Extract user data from the query result
+      var userData = querySnapshot.docs.first.data();
+
+      // Check if the password matches
+      if (userData['password'] == password) {
+        // Save the login status in SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('studentIndex', studentIndex);
+
+        // Navigate to the next screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Navbar()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Invalid student index or password')),
+        );
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred. Please try again later.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21), // Background color from your design
+      backgroundColor: const Color(0xFF0A0E21),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -17,7 +73,6 @@ class LoginPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Welcome Text
                 Text(
                   "Welcome!",
                   style: TextStyle(
@@ -31,21 +86,19 @@ class LoginPage extends StatelessWidget {
                   "Sign in to continue",
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.grey[400], // Subtext color
+                    color: Colors.grey[400],
                   ),
                 ),
                 SizedBox(height: 30),
-            
-                // Student Index Input
                 TextField(
                   controller: studentIndexController,
                   style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: const Color(0xFF2D2F41), // Input field background color
+                    fillColor: const Color(0xFF2D2F41),
                     hintText: 'Student Index',
                     hintStyle: TextStyle(color: Colors.grey),
-                    prefixIcon: Icon(Icons.person, color: Colors.yellow), // Replace with SVG if needed
+                    prefixIcon: Icon(Icons.person, color: Colors.yellow),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       borderSide: BorderSide.none,
@@ -53,18 +106,16 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
-            
-                // Password Input
                 TextField(
                   controller: passwordController,
                   obscureText: true,
                   style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: const Color(0xFF2D2F41), // Input field background color
+                    fillColor: const Color(0xFF2D2F41),
                     hintText: 'Password',
                     hintStyle: TextStyle(color: Colors.grey),
-                    prefixIcon: Icon(Icons.lock, color: Colors.red), // Replace with SVG if needed
+                    prefixIcon: Icon(Icons.lock, color: Colors.red),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       borderSide: BorderSide.none,
@@ -72,23 +123,18 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
-            
-                // Sign In Button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00D084), // Green color from your design
+                      backgroundColor: const Color(0xFF00D084),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute<void>(
-                        builder: (BuildContext context) =>  Navbar(),
-                      ),);
-                      // Handle sign in
+                      authenticateUser(context);
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -107,14 +153,9 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
-            
-                // Forgot Password
                 Center(
                   child: TextButton(
-                    onPressed: () {
-
-                      // Handle forgot password
-                    },
+                    onPressed: () {},
                     child: Text(
                       "Forgot password?",
                       style: TextStyle(
