@@ -1,4 +1,4 @@
-Here’s a sample README file for your Student Support System project:
+ Student Support System project:
 
 ---
 
