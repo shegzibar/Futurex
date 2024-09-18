@@ -46,21 +46,21 @@ class _ChatscreenState extends State<Chatscreen> {
     try {
       // Initialize the GenerativeModel from the google_generative_ai plugin with your API key
       final gemini = GenerativeModel(
-        model: 'gemini-pro', // Use 'gemini-pro' model or adjust as needed
-        apiKey: 'AIzaSyDt4BgKeSJL319J2Ynha6hpzM1tq9eSs2E', // Replace with your actual API key
+        model: 'gemini-pro', // Using gemini-pro
+        apiKey: 'AIzaSyDt4BgKeSJL319J2Ynha6hpzM1tq9eSs2E',
       );
 
       // Generate a message using the Gemini API
       final content = [Content.text(userMessage)];
       final response = await gemini.generateContent(content);
 
-      // Add Gemini's response to the chat
+      // Add Gemini responses to the chat
       setState(() {
         messages.add({"type": "gemini", "content": response.text}); // Add Gemini’s response
-        isSendingMessage = false; // Hide loading
+        isSendingMessage = false;
       });
 
-      // Scroll to the bottom after receiving the response
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -71,7 +71,7 @@ class _ChatscreenState extends State<Chatscreen> {
     } catch (e) {
       print('Error communicating with Gemini: $e');
       setState(() {
-        isSendingMessage = false; // Hide loading on error
+        isSendingMessage = false;
       });
     }
   }

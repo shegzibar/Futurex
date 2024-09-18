@@ -9,14 +9,13 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  String userIndex = "201902008"; // Assuming you know the user's index, e.g., 1 for now. Adjust this as needed.
 
   // Function to fetch the user data by index from Firestore
-  Future<Map<String, dynamic>> _getUserDataByIndex(String index) async {
-    // Query Firestore collection 'users' where 'index' matches the given userIndex
+  Future<Map<String, dynamic>> _getUserDataByIndex() async {
+
     QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('index')
+        .collection('Students')
+        .where('index', isEqualTo: "the document id")
         .get();
 
     if (snapshot.docs.isNotEmpty) {
@@ -56,7 +55,7 @@ class _SettingsState extends State<Settings> {
 
             // Display user name below the logo
             FutureBuilder<Map<String, dynamic>>(
-              future: _getUserDataByIndex(userIndex), // Fetch user data by index
+              future: _getUserDataByIndex(), // Fetch user data by index
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator(); // Show loading spinner
