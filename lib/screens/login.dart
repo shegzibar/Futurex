@@ -22,7 +22,7 @@ class LoginPage extends StatelessWidget {
     try {
       // Fetch the document from Firestore where studentIndex matches
       var querySnapshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('Students')
           .where('index', isEqualTo: studentIndex)
           .get();
 

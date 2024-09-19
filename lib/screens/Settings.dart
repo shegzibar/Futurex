@@ -9,13 +9,31 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  String? userIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserIndex();
+  }
+
+  // Load the user's index from SharedPreferences
+  Future<void> _loadUserIndex() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userIndex = prefs.getString('studentIndex'); // Assuming 'index' is the key
+    });
+  }
 
   // Function to fetch the user data by index from Firestore
   Future<Map<String, dynamic>> _getUserDataByIndex() async {
+    if (userIndex == null) {
+      throw Exception("User index not found");
+    }
 
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('Students')
-        .where('index', isEqualTo: "the document id")
+        .where('index', isEqualTo: userIndex) // Compare with user's index
         .get();
 
     if (snapshot.docs.isNotEmpty) {
@@ -71,7 +89,7 @@ class _SettingsState extends State<Settings> {
                   );
                 } else {
                   // Extract user's name from the snapshot
-                  String userName = snapshot.data!['name'] ?? 'Unknown User';
+                  String userName = snapshot.data!['fullName'] ?? 'Unknown User';
                   return Text(
                     userName,
                     style: const TextStyle(
