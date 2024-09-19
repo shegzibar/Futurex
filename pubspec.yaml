@@ -41,8 +41,8 @@ dependencies:
   firebase_auth:
   cloud_firestore:
   firebase_core:
-  image_picker:
-
+  file_picker:
+  flutter_pdfview:
 dev_dependencies:
   flutter_test:
     sdk: flutter

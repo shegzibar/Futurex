@@ -2,8 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_generative_ai/google_generative_ai.dart'; // Import the plugin
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
+import 'package:file_picker/file_picker.dart'; // For picking files
+import 'package:flutter_pdfview/flutter_pdfview.dart'; // For displaying PDF files
+import 'dart:convert'; // For encoding the file into base64
 
 class Chatscreen extends StatefulWidget {
   @override
@@ -17,6 +20,8 @@ class _ChatscreenState extends State<Chatscreen> {
   final List<String> recommendations = ["results", "schedule", "courses"];
   bool showRecommendations = true; // Control showing/hiding the recommendations
   bool isSendingMessage = false; // Prevent multiple messages and show loading
+  String userIndex = ""; // Store the user index
+  String userNews = ""; // Store the user's news
 
   @override
   void initState() {
@@ -24,15 +29,17 @@ class _ChatscreenState extends State<Chatscreen> {
   }
 
   // Function to send a request to Gemini
-  Future<void> sendMessageToGemini(String userMessage) async {
-    setState(() {
-      isSendingMessage = true; // Show loading
-      messages.add({"type": "user", "content": userMessage});
-      showRecommendations = false; // Hide recommendations once a message is sent
-    });
+  Future<void> sendMessageToGemini(String userMessage, {bool showToUser = true}) async {
+    if (showToUser) {
+      setState(() {
+        isSendingMessage = true; // Show loading
+        messages.add({"type": "user", "content": userMessage});
+        showRecommendations = false; // Hide recommendations once a message is sent
+      });
 
-    // Clear the input field
-    _controller.clear();
+      // Clear the input field
+      _controller.clear();
+    }
 
     // Scroll to the bottom after adding a new message
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -55,11 +62,12 @@ class _ChatscreenState extends State<Chatscreen> {
       final response = await gemini.generateContent(content);
 
       // Add Gemini responses to the chat
-      setState(() {
-        messages.add({"type": "gemini", "content": response.text}); // Add Gemini’s response
-        isSendingMessage = false;
-      });
-
+      if (showToUser) {
+        setState(() {
+          messages.add({"type": "gemini", "content": response.text}); // Add Gemini’s response
+          isSendingMessage = false;
+        });
+      }
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollController.animateTo(
@@ -80,6 +88,62 @@ class _ChatscreenState extends State<Chatscreen> {
   void addMessage(String message) {
     if (!isSendingMessage) {
       sendMessageToGemini(message); // Allow sending only when not waiting for a response
+    }
+  }
+
+  // Function to pick a PDF file
+  Future<void> pickPDFFile() async {
+    print("Started picking PDF file...");
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+
+      if (result != null) {
+        PlatformFile file = result.files.first;
+        print("Picked file: ${file.name}");
+
+        // Proceed to add to chat
+        setState(() {
+          messages.add({
+            "type": "user",
+            "content": file.name,
+            "filePath": file.path
+          });
+        });
+
+        // Send to Gemini
+        await sendPDFToGemini(file.path!);
+      } else {
+        print("User canceled picking file.");
+      }
+    } catch (e) {
+      print("Error during PDF file picking: $e");
+    }
+  }
+
+
+  // Function to send PDF to Gemini
+  Future<void> sendPDFToGemini(String filePath) async {
+    try {
+      // Convert the file to binary or base64 and send it via the API
+      final gemini = GenerativeModel(
+        model: 'gemini-pro',
+        apiKey: 'AIzaSyDt4BgKeSJL319J2Ynha6hpzM1tq9eSs2E',
+      );
+
+      // Read and encode the file as Base64
+      final fileBytes = await File(filePath).readAsBytes();
+      final content = [Content.text(base64Encode(fileBytes))]; // Example to encode file content
+      final response = await gemini.generateContent(content);
+
+      // Add the Gemini response to the chat
+      setState(() {
+        messages.add({"type": "gemini", "content": response.text});
+      });
+    } catch (e) {
+      print('Error sending PDF to Gemini: $e');
     }
   }
 
@@ -208,6 +272,12 @@ class _ChatscreenState extends State<Chatscreen> {
             padding: const EdgeInsets.all(10.0),
             child: Row(
               children: [
+                IconButton(
+                  icon: Icon(Icons.attach_file, color: Colors.greenAccent),
+                  onPressed: () {
+                    pickPDFFile(); // Pick and send a PDF file
+                  },
+                ),
                 Expanded(
                   child: TextField(
                     controller: _controller,
@@ -218,37 +288,22 @@ class _ChatscreenState extends State<Chatscreen> {
                       });
                     },
                     decoration: InputDecoration(
+                      hintText: 'Type a message...',
+                      hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5)),
                       filled: true,
-                      fillColor: Colors.grey[800],
-                      hintText: 'Send a message...',
-                      hintStyle: const TextStyle(color: Colors.white54),
+                      fillColor: Colors.black26,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
                 IconButton(
-                  icon: const Icon(Icons.send, color: Colors.green),
+                  icon: Icon(Icons.send, color: Colors.greenAccent),
                   onPressed: () {
                     if (_controller.text.isNotEmpty && !isSendingMessage) {
-                      addMessage(_controller.text); // Send the message to Gemini
-                    }
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.photo, color: Colors.green),
-                  onPressed: () async {
-                    final ImagePicker _picker = ImagePicker();
-                    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-                    if (image != null && !isSendingMessage) {
-                      setState(() {
-                        // Display the image in the input field (small thumbnail)
-                        _controller.text = "Image selected"; // Example placeholder text
-                      });
-                      // Code to handle sending the image goes here
+                      addMessage(_controller.text);
                     }
                   },
                 ),
