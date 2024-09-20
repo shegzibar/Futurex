@@ -38,6 +38,9 @@ dependencies:
   table_calendar: ^3.0.2
   shared_preferences:
   google_generative_ai:
+  flutter_gemini: ^2.0.5
+  dash_chat_2: ^0.0.21
+  image_picker: ^1.1.2
   firebase_auth:
   cloud_firestore:
   firebase_core:

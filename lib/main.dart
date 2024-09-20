@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:futurex/screens/login.dart';
 import 'package:futurex/screens/navbar.dart';
 import 'package:futurex/screens/onboardingpage.dart';
@@ -7,6 +8,9 @@ import 'package:shared_preferences/shared_preferences.dart';
  // Import the onboarding page
 
 void main() async {
+  Gemini.init(
+    apiKey: 'AIzaSyCnkcuYgtMSvcvcGHkN3ok0-ClSXnfg9V4',
+  );
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: const FirebaseOptions(
