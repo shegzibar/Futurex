@@ -21,7 +21,7 @@ class _SettingsState extends State<Settings> {
   Future<void> _loadUserIndex() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      userIndex = prefs.getString('studentIndex'); // Assuming 'index' is the key
+      userIndex = prefs.getString('studentIndex'); // Assuming 'studentIndex' is the key
     });
   }
 
@@ -71,7 +71,7 @@ class _SettingsState extends State<Settings> {
 
             const SizedBox(height: 10),
 
-            // Display user name below the logo
+            // Display user information below the logo
             FutureBuilder<Map<String, dynamic>>(
               future: _getUserDataByIndex(), // Fetch user data by index
               builder: (context, snapshot) {
@@ -88,15 +88,38 @@ class _SettingsState extends State<Settings> {
                     style: TextStyle(color: Colors.white),
                   );
                 } else {
-                  // Extract user's name from the snapshot
+                  // Extract user's name, gmail, and faculty from the snapshot
                   String userName = snapshot.data!['fullName'] ?? 'Unknown User';
-                  return Text(
-                    userName,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  String userGmail = snapshot.data!['email'] ?? 'No Email';
+                  String userFaculty = snapshot.data!['faculty'] ?? 'No Faculty';
+
+                  return Column(
+                    children: [
+                      Text(
+                        userName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Email: $userGmail',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        'Faculty: $userFaculty',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
                   );
                 }
               },
