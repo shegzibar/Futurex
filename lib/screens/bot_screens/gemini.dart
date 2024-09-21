@@ -32,6 +32,7 @@ class _ChatscreenState extends State<Chatscreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0A0E21), // Dark theme color
         centerTitle: true,
+        leading: IconButton(onPressed: (){Navigator.pop(context);}, icon: Icon(Icons.arrow_back,color: Colors.white,)),
         title: const Text(
           "Gemini Chat", style: TextStyle(color: Colors.white),
         ),
