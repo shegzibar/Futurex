@@ -25,13 +25,15 @@ class _ChatscreenState extends State<Chatscreen> {
     profileImage:
     "https://seeklogo.com/images/G/google-gemini-logo-A5787B2669-seeklogo.com.png",
   );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFF0A0E21), // Dark theme color
         centerTitle: true,
         title: const Text(
-          "Gemini Chat",
+          "Gemini Chat", style: TextStyle(color: Colors.white),
         ),
       ),
       body: _buildUI(),
@@ -39,18 +41,51 @@ class _ChatscreenState extends State<Chatscreen> {
   }
 
   Widget _buildUI() {
-    return DashChat(
-      inputOptions: InputOptions(trailing: [
-        IconButton(
-          onPressed: _sendMediaMessage,
-          icon: const Icon(
-            Icons.image,
+    return Container(
+      color: const Color(0xFF0A0E21), // Dark background color for the chat screen
+      child: DashChat(
+        inputOptions: InputOptions(
+          inputTextStyle: TextStyle(
+            color: Colors.white, // Set the input text color to white
           ),
-        )
-      ]),
-      currentUser: currentUser,
-      onSend: _sendMessage,
-      messages: messages,
+          inputDecoration: InputDecoration(
+            filled: true,
+
+            fillColor: const Color(0xFF141A2E), // Input background color
+            hintText: 'Type a message...',
+            hintStyle: const TextStyle(color: Colors.white70),
+
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+              borderSide: BorderSide.none,
+            ),
+          ),
+          // Customize the send icon button
+          trailing: [
+            IconButton(
+              onPressed: _sendMediaMessage,
+              icon: const Icon(
+                Icons.image,
+                color: Colors.white, // Icon color to match theme
+              ),
+            )
+          ],
+        ),
+        messageOptions: MessageOptions(
+          currentUserTextColor: Colors.white,
+          textColor: Colors.white,
+          // Bubble color for current user
+          currentUserContainerColor: const Color(0xFF1D1E33),
+          // Bubble color for Gemini
+          containerColor: const Color(0xFF141A2E),
+        ),
+        // Customization for chat avatar and profile images
+
+        // Custom chat user and messages
+        currentUser: currentUser,
+        onSend: _sendMessage,
+        messages: messages,
+      ),
     );
   }
 
@@ -66,12 +101,10 @@ class _ChatscreenState extends State<Chatscreen> {
           File(chatMessage.medias!.first.url).readAsBytesSync(),
         ];
       }
-      gemini
-          .streamGenerateContent(
+      gemini.streamGenerateContent(
         question,
         images: images,
-      )
-          .listen((event) {
+      ).listen((event) {
         ChatMessage? lastMessage = messages.firstOrNull;
         if (lastMessage != null && lastMessage.user == geminiUser) {
           lastMessage = messages.removeAt(0);
