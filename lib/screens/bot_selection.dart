@@ -117,7 +117,8 @@ class BotSelectionPage extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 10,),
-                Text("shit is here working well",style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),)
+                Text("Choose gemini for explanation ",style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),),
+                Text("Choose Fuassitance for inquary ",style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),)
               ],
             ),
           ),
