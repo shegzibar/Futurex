@@ -22,7 +22,75 @@ class _HomeState extends State<Home> {
     super.initState();
     _fetchNewsDates();  // Fetch news dates from Firestore on init
   }
+_showdialog(String title , String news, String from,String Th,String Tm , String Td,String tM,String Ty){
+  showDialog(context: context, builder: (BuildContext context){
+    return AlertDialog(
+      title: const Text(
+        'Details',
+        style: TextStyle(color: Colors.white),
 
+      ),
+      backgroundColor: const Color(0xFF141A2E),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      content: SingleChildScrollView(
+        child:  Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              news,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      "From: ${from}",
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      "${Th}:${Tm} on ${Td}/${tM}/${Ty}",
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+  });
+}
   // Function to fetch dates with news from Firestore
   void _fetchNewsDates() async {
     QuerySnapshot snapshot = await _firestore.collection('News').get();
@@ -195,62 +263,67 @@ class _HomeState extends State<Home> {
                             final newsItem = newsItems[index];
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Container(
-                                padding: const EdgeInsets.all(12.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.blueGrey[800],
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      newsItem['title'],
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                      newsItem['news'],
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              "From: ${newsItem['from']}",
-                                              style: const TextStyle(
-                                                color: Colors.white54,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
+                              child: GestureDetector(
+                                onTap: (){
+                                _showdialog(newsItem['title'], newsItem['news'],newsItem['from'],'${newsItem['time'].hour}','${newsItem['time'].minute}','${newsItem['time'].day}','${newsItem['time'].month}','${newsItem['time'].year}');
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(12.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blueGrey[800],
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        newsItem['title'],
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                        const SizedBox(height: 5),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              "${newsItem['time'].hour}:${newsItem['time'].minute} on ${newsItem['time'].day}/${newsItem['time'].month}/${newsItem['time'].year}",
-                                              style: const TextStyle(
-                                                color: Colors.white54,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        newsItem['news'],
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 14,
                                         ),
-                                      ],
-                                    ),
-                                  ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "From: ${newsItem['from']}",
+                                                style: const TextStyle(
+                                                  color: Colors.white54,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                "${newsItem['time'].hour}:${newsItem['time'].minute} on ${newsItem['time'].day}/${newsItem['time'].month}/${newsItem['time'].year}",
+                                                style: const TextStyle(
+                                                  color: Colors.white54,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );

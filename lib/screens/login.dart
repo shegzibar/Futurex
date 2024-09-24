@@ -1,14 +1,26 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:futurex/screens/navbar.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final TextEditingController studentIndexController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool isLoading = false; // State for loading animation
+  bool isSuccess = false; // State for success animation
 
   // Function to authenticate user by checking Firestore
   Future<void> authenticateUser(BuildContext context) async {
+    setState(() {
+      isLoading = true; // Start loading animation
+    });
+
     String studentIndex = studentIndexController.text;
     String password = passwordController.text;
 
@@ -16,6 +28,9 @@ class LoginPage extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please fill in all fields')),
       );
+      setState(() {
+        isLoading = false;
+      });
       return;
     }
 
@@ -30,6 +45,9 @@ class LoginPage extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Invalid student index or password')),
         );
+        setState(() {
+          isLoading = false;
+        });
         return;
       }
 
@@ -43,21 +61,34 @@ class LoginPage extends StatelessWidget {
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('studentIndex', studentIndex);
 
-        // Navigate to the next screen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Navbar()),
-        );
+        setState(() {
+          isLoading = false;
+          isSuccess = true; // Trigger success animation
+        });
+
+        // Delay navigation for animation effect
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Navbar()),
+          );
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Invalid student index or password')),
         );
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred. Please try again later.')),
       );
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -134,9 +165,57 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      authenticateUser(context);
+                      if (!isLoading) {
+                        authenticateUser(context);
+                      }
                     },
-                    child: Row(
+                    child: isLoading
+                        ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          'Signing in...',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    )
+                        : isSuccess
+                        ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedTextKit(
+                          animatedTexts: [
+                            ColorizeAnimatedText(
+                              'Welcome!',
+                              textStyle: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              colors: [
+                                Colors.yellow,
+                                Colors.red,
+                                Colors.green,
+                                Colors.blue,
+                              ],
+                            ),
+                          ],
+                          isRepeatingAnimation: false,
+                        ),
+                      ],
+                    )
+                        : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
