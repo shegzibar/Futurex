@@ -129,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                     fillColor: const Color(0xFF2D2F41),
                     hintText: 'Student Index',
                     hintStyle: TextStyle(color: Colors.grey),
-                    prefixIcon: Icon(Icons.person, color: Colors.yellow),
+                    prefixIcon: Icon(Icons.person, color: Colors.white),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       borderSide: BorderSide.none,
@@ -146,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
                     fillColor: const Color(0xFF2D2F41),
                     hintText: 'Password',
                     hintStyle: TextStyle(color: Colors.grey),
-                    prefixIcon: Icon(Icons.lock, color: Colors.red),
+                    prefixIcon: Icon(Icons.lock, color: Colors.white),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       borderSide: BorderSide.none,

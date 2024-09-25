@@ -99,7 +99,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               : ElevatedButton(
             onPressed: _nextPage,
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: const Text("Next"),
+            child: const Text("Next",style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

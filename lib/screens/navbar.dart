@@ -15,9 +15,9 @@ class _NavbarState extends State<Navbar> {
 
   // List of pages for the navigation bar
   final List<Widget> _pages = [
-    BotSelectionPage(),  // Index 0
-    Home(),       // Index 1 (center button)
-    Settings(),   // Index 2
+    BotSelectionPage(),
+    Home(),
+    Settings(),
   ];
 
   void _onItemTapped(int index) {
