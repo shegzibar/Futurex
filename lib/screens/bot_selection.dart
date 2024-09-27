@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:futurex/screens/bot_screens/assistance_screen.dart';
 import 'package:futurex/screens/bot_screens/gemini.dart';
 
 class BotSelectionPage extends StatelessWidget {
@@ -75,6 +76,9 @@ class BotSelectionPage extends StatelessWidget {
                       children: [
                         ElevatedButton(
                           onPressed: () {
+                            Navigator.push(context,  MaterialPageRoute<void>(
+                              builder: (BuildContext context) =>  AssistanceChatbot(),
+                            ),);
                             // Handle the action for selecting Assistant
                           },
                           style: ElevatedButton.styleFrom(
