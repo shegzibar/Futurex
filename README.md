@@ -105,6 +105,6 @@ Home Screen
 
  Future Enhancements
 
-- Integrating more advanced natural language processing capabilities into **Gemini** for improved user interaction.
+- Integrating more advanced natural language processing capabilities into **Chat assistance i** for improved user interaction.
 - Expanding the notification system to allow for push notifications on upcoming events.
 - Additional features for real-time collaboration among students and faculty.
