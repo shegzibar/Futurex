@@ -120,7 +120,7 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
     });
   }
 
-  // Function to send the user message to the Flask chatbot API
+  // Function to get flask data or backened
   Future<String> sendMessageToFlask(String userMessage) async {
     final response = await http.post(
       Uri.parse(''), // Replace with your Flask backend URL
