@@ -1,4 +1,4 @@
- Student Support System project:
+
 
 ---
 
@@ -95,13 +95,28 @@ Screens
 Home Screen
 - Displays a calendar view where users can see events/news marked with dots on specific dates.
 - Includes a real-time **weekly news section** retrieved from Firestore.
+- ![home](https://github.com/user-attachments/assets/7f33ce82-4176-4f58-af86-65a18c76d5ad)
+
+
 
  Settings Screen
 - Displays the user profile with a circular avatar and user name fetched from Firestore.
 - Includes a logout button.
+- 
+![settings ](https://github.com/user-attachments/assets/c182d647-8909-4f17-9d38-ce6a9d999793)
 
  Chat Screen
 - Features a **chatbot interface** where students can interact with the assistant for help with results, schedules, courses, and more.
+
+  Gemini :
+
+![gemini](https://github.com/user-attachments/assets/5349f0ee-3f18-4dc4-9980-0a53edd29a36)
+
+Future assistance :
+
+![future assitance ](https://github.com/user-attachments/assets/98aac89c-efe0-4a45-97e3-d3fe315a7e60)
+
+
 
  Future Enhancements
 
