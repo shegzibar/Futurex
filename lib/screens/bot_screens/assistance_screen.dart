@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AssistanceChatbot extends StatefulWidget {
@@ -12,33 +11,32 @@ class AssistanceChatbot extends StatefulWidget {
 
 class _AssistanceChatbotState extends State<AssistanceChatbot> {
   String? userIndex;
+
   Future<void> _loadUserIndex() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       userIndex = prefs.getString('studentIndex'); // Assuming 'studentIndex' is the key
     });
   }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _loadUserIndex();
   }
+
   List<ChatMessage> messages = [];
   final ChatUser currentUser = ChatUser(id: 'user');
   final ChatUser geminiUser = ChatUser(
     id: 'bot',
     firstName: 'Futurex',
-    profileImage:
-    'https://pbs.twimg.com/profile_images/1182918083641593856/VlcETqrt_400x400.jpg', // Optional: Gemini's avatar
+    profileImage: 'https://pbs.twimg.com/profile_images/1182918083641593856/VlcETqrt_400x400.jpg', // Optional: Gemini's avatar
   );
 
   final ScrollController _scrollController = ScrollController(); // ScrollController
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF0A0E21), // Dark theme color
@@ -57,7 +55,6 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
       body: Container(
         color: const Color(0xFF0A0E21), // Dark background color
         child: DashChat(
-          // Attach ScrollController
           currentUser: currentUser,
           messages: messages,
           inputOptions: InputOptions(
@@ -105,9 +102,51 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
             });
 
             _scrollToBottom(); // Scroll to bottom after receiving response
+
+            // Check if the message contains the word 'subject'
+            if (message.text.toLowerCase().contains("subject")) {
+              // Show the bottom alert box after a 5-second delay
+              Future.delayed(Duration(seconds: 5), () {
+                _showSubjectBottomSheet(context);
+              });
+            }
           },
         ),
       ),
+    );
+  }
+
+  // Function to show a bottom sheet when 'subject' is detected
+  void _showSubjectBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Curved edges
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF0A0E21), // Dark background color
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Curved edges
+          ),
+          height: 200,
+          child: Center(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green, // Green button color
+              ),
+              onPressed: () {
+                // Navigate to the subjects page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SubjectsPage()),
+                );
+              },
+              child: Text('Go to Subjects'),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -123,7 +162,7 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
   // Function to get flask data or backened
   Future<String> sendMessageToFlask(String userMessage) async {
     final response = await http.post(
-      Uri.parse(''), // Replace with your Flask backend URL
+      Uri.parse('https://c567-154-177-179-180.ngrok-free.app/ask'), // Replace with your Flask backend URL
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'question': userMessage,
@@ -138,5 +177,24 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
     } else {
       return 'Error: Could not connect to the chatbot';
     }
+  }
+}
+
+// Dummy page for subjects
+class SubjectsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0A0E21),
+        title: Text('Subjects', style: TextStyle(color: Colors.white)),
+      ),
+      body: Center(
+        child: Text(
+          'This is the Subjects page',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
   }
 }
