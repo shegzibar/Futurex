@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
+import 'package:futurex/screens/bot_screens/assistance_screen.dart';
+import 'package:futurex/screens/sheets.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';  // Import Firebase
@@ -210,24 +212,3 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
 }
 
 // Dummy page for subjects
-class SubjectsPage extends StatelessWidget {
-  final String subjectName; // Subject name passed to the page
-
-  SubjectsPage(this.subjectName);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0E21),
-        title: Text('$subjectName', style: TextStyle(color: Colors.white)), // Display subject name in the title
-      ),
-      body: Center(
-        child: Text(
-          'This is the $subjectName page',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-    );
-  }
-}

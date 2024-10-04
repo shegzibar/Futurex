@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
-class sheet extends StatefulWidget {
-  const sheet({super.key});
+class SubjectsPage extends StatelessWidget {
+  final String subjectName; // Subject name passed to the page
 
-  @override
-  State<sheet> createState() => _sheetState();
-}
+  SubjectsPage(this.subjectName);
 
-class _sheetState extends State<sheet> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0A0E21),
+        title: Text('$subjectName', style: TextStyle(color: Colors.white)), // Display subject name in the title
+      ),
+      body: Center(
+        child: Text(
+          'This is the $subjectName page',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
   }
 }
