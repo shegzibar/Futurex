@@ -18,6 +18,7 @@ void main() async {
       appId: "1:826402051210:android:f1cad09a3cd64260f30973",
       messagingSenderId: "826402051210",
       projectId: "futurex-19db0",
+      storageBucket: "futurex-19db0.appspot.com",
     ),
   );
 //login

@@ -50,6 +50,10 @@ dependencies:
   firebase_core:
   file_picker:
   flutter_pdfview:
+  firebase_storage:
+  permission_handler:
+  path_provider:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
