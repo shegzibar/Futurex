@@ -15,24 +15,31 @@ class SubjectsPage extends StatefulWidget {
 
 class _SubjectsPageState extends State<SubjectsPage> {
   late Future<ListResult> _futureFiles;
+  bool _storagePermissionGranted = false;
 
   @override
   void initState() {
     super.initState();
-    _futureFiles = FirebaseStorage.instance
-        .ref('futurex-19db0.appspot.com')
-        .listAll(); // Fetch files for the given subject
+    _requestStoragePermission();
+  }
+
+  // Request storage permissions before displaying files
+  Future<void> _requestStoragePermission() async {
+    var status = await Permission.storage.request();
+    if (status.isGranted) {
+      setState(() {
+        _storagePermissionGranted = true;
+        _futureFiles = FirebaseStorage.instance.ref('/').listAll(); // Fetch files for the given subject
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Storage permission not granted')),
+      );
+    }
   }
 
   Future<void> _downloadFile(Reference ref) async {
     try {
-      // Request storage permissions
-      var status = await Permission.storage.request();
-      if (!status.isGranted) {
-        print('Storage permission not granted');
-        return;
-      }
-
       // Get app's local directory
       final dir = await getApplicationDocumentsDirectory();
       final filePath = '${dir.path}/${ref.name}';
@@ -56,7 +63,8 @@ class _SubjectsPageState extends State<SubjectsPage> {
         backgroundColor: const Color(0xFF0A0E21),
         title: Text('${widget.subjectName}', style: TextStyle(color: Colors.white)),
       ),
-      body: FutureBuilder<ListResult>(
+      body: _storagePermissionGranted
+          ? FutureBuilder<ListResult>(
         future: _futureFiles,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -68,23 +76,42 @@ class _SubjectsPageState extends State<SubjectsPage> {
           } else {
             final files = snapshot.data!.items;
 
-            return ListView.builder(
+            return GridView.builder(
+              padding: const EdgeInsets.all(10),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Display 2 items per row
+                childAspectRatio: 2, // Adjust as needed for item sizing
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+              ),
               itemCount: files.length,
               itemBuilder: (context, index) {
                 final file = files[index];
 
-                return ListTile(
-                  title: Text(file.name, style: TextStyle(color: Colors.white)),
-                  trailing: IconButton(
-                    icon: Icon(Icons.download, color: Colors.white),
-                    onPressed: () => _downloadFile(file),
+                return Card(
+                  color: const Color(0xFF1D1E33),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        file.name,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      SizedBox(height: 10),
+                      IconButton(
+                        icon: Icon(Icons.download, color: Colors.white),
+                        onPressed: () => _downloadFile(file),
+                      ),
+                    ],
                   ),
                 );
               },
             );
           }
         },
-      ),
+      )
+          : Center(child: Text('Waiting for storage permission')),
       backgroundColor: const Color(0xFF0A0E21),
     );
   }
