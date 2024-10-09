@@ -173,7 +173,7 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
                   MaterialPageRoute(builder: (context) => SubjectsPage(subjectName)),
                 );
               },
-              child: Text('Go to $subjectName'), // Update button text with subject name
+              child: Text('Go to $subjectName', style: TextStyle(color: Colors.white),), // Update button text with subject name
             ),
           ),
         );

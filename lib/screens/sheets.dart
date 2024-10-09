@@ -29,7 +29,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
     if (status.isGranted) {
       setState(() {
         _storagePermissionGranted = true;
-        _futureFiles = FirebaseStorage.instance.ref('/').listAll(); // Fetch files for the given subject
+        _futureFiles = FirebaseStorage.instance.ref('/${widget.subjectName}').listAll(); // Fetch files for the given subject
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
