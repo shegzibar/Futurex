@@ -15,32 +15,39 @@ class SubjectsPage extends StatefulWidget {
 
 class _SubjectsPageState extends State<SubjectsPage> {
   late Future<ListResult> _futureFiles;
-  bool _storagePermissionGranted = false;
+late String name;
+
 
   @override
   void initState() {
     super.initState();
-    _requestStoragePermission();
+    name = widget.subjectName.trim();
+    _futureFiles = FirebaseStorage.instance
+        .ref('$name/')
+        .listAll(); // Fetch files for the given subject
   }
 
-  // Request storage permissions before displaying files
-  Future<void> _requestStoragePermission() async {
-    var status = await Permission.storage.request();
-    if (status.isGranted) {
-      setState(() {
-        _storagePermissionGranted = true;
-        _futureFiles = FirebaseStorage.instance.ref('/${widget.subjectName}').listAll(); // Fetch files for the given subject
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Storage permission not granted')),
-      );
+  // Method to check and request storage permission before downloading
+  Future<bool> _checkAndRequestStoragePermission() async {
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      status = await Permission.storage.request();
     }
+    return status.isGranted;
   }
 
   Future<void> _downloadFile(Reference ref) async {
     try {
-      // Get app's local directory
+      // Check and request permission first
+      bool permissionGranted = await _checkAndRequestStoragePermission();
+      if (!permissionGranted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Storage permission not granted')),
+        );
+        return;
+      }
+
+      // If permission is granted, proceed with downloading the file
       final dir = await getApplicationDocumentsDirectory();
       final filePath = '${dir.path}/${ref.name}';
       final file = File(filePath);
@@ -63,8 +70,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
         backgroundColor: const Color(0xFF0A0E21),
         title: Text('${widget.subjectName}', style: TextStyle(color: Colors.white)),
       ),
-      body: _storagePermissionGranted
-          ? FutureBuilder<ListResult>(
+      body: FutureBuilder<ListResult>(
         future: _futureFiles,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -89,29 +95,31 @@ class _SubjectsPageState extends State<SubjectsPage> {
                 final file = files[index];
 
                 return Card(
+
                   color: const Color(0xFF1D1E33),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        file.name,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      SizedBox(height: 10),
-                      IconButton(
-                        icon: Icon(Icons.download, color: Colors.white),
-                        onPressed: () => _downloadFile(file),
-                      ),
-                    ],
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          file.name,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        SizedBox(height: 10),
+                        IconButton(
+                          icon: Icon(Icons.download, color: Colors.white),
+                          onPressed: () => _downloadFile(file),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
             );
           }
         },
-      )
-          : Center(child: Text('Waiting for storage permission')),
+      ),
       backgroundColor: const Color(0xFF0A0E21),
     );
   }
