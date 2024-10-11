@@ -67,7 +67,13 @@ late String name;
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back, color: Colors.white)),
         backgroundColor: const Color(0xFF0A0E21),
+
         title: Text('${widget.subjectName}', style: TextStyle(color: Colors.white)),
       ),
       body: FutureBuilder<ListResult>(
