@@ -193,7 +193,7 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
   // Function to get flask data or backend
   Future<String> sendMessageToFlask(String userMessage) async {
     final response = await http.post(
-      Uri.parse('https://c567-154-177-179-180.ngrok-free.app/ask'), // Replace with your Flask backend URL
+      Uri.parse('https://0578-154-177-204-250.ngrok-free.app/ask'), // Replace with your Flask backend URL
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'question': userMessage,

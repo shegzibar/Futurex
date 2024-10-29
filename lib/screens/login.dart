@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:futurex/screens/navbar.dart';
+import 'package:futurex/screens/forgot_pass.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -234,7 +235,12 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 20),
                 Center(
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Navigator.push(context, MaterialPageRoute<void>(
+                      //   builder: (BuildContext context) =>  forget(),
+                      // ),
+                      // );
+                    },
                     child: Text(
                       "Forgot password?",
                       style: TextStyle(
