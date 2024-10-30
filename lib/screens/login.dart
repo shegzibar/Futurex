@@ -236,10 +236,10 @@ class _LoginPageState extends State<LoginPage> {
                 Center(
                   child: TextButton(
                     onPressed: () {
-                      // Navigator.push(context, MaterialPageRoute<void>(
-                      //   builder: (BuildContext context) =>  forget(),
-                      // ),
-                      // );
+                      Navigator.push(context, MaterialPageRoute<void>(
+                        builder: (BuildContext context) =>  forget(),
+                      ),
+                      );
                     },
                     child: Text(
                       "Forgot password?",

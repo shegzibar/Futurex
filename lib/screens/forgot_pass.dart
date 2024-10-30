@@ -9,6 +9,12 @@ class forget extends StatefulWidget {
 class _forgetState extends State<forget> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Password"),
+        centerTitle: true,
+      ),
+
+    );
   }
 }
