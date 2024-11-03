@@ -6,7 +6,7 @@ class forget extends StatefulWidget {
   @override
   State<forget> createState() => _forgetState();
 }
-
+//forget password
 class _forgetState extends State<forget> {
   @override
   Widget build(BuildContext context) {
