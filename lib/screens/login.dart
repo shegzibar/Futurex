@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:futurex/screens/navbar.dart';
 import 'package:futurex/screens/forgot_pass.dart';
-
+//for the commit
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
