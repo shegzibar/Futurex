@@ -4,9 +4,9 @@ import 'package:futurex/screens/bot_screens/assistance_screen.dart';
 import 'package:futurex/screens/sheets.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';  // Import Firebase
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+//assistance chat bot
 class AssistanceChatbot extends StatefulWidget {
   @override
   _AssistanceChatbotState createState() => _AssistanceChatbotState();
@@ -193,7 +193,7 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
   // Function to get flask data or backend
   Future<String> sendMessageToFlask(String userMessage) async {
     final response = await http.post(
-      Uri.parse('https://0578-154-177-204-250.ngrok-free.app/ask'), // Replace with your Flask backend URL
+      Uri.parse('https://8c15-154-177-195-39.ngrok-free.app/ask'), // Replace with your Flask backend URL
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'question': userMessage,
