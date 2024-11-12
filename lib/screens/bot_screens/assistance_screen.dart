@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:futurex/screens/bot_screens/assistance_screen.dart';
-import 'package:futurex/screens/sheets.dart';
+import 'package:futurex/screens/instruction.dart';
+import 'package:futurex/screens/sheets.dart'; // Import instructions widget
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//assistance chat bot
+
+
+// Assistance chatbot
 class AssistanceChatbot extends StatefulWidget {
   @override
   _AssistanceChatbotState createState() => _AssistanceChatbotState();
@@ -14,7 +17,7 @@ class AssistanceChatbot extends StatefulWidget {
 
 class _AssistanceChatbotState extends State<AssistanceChatbot> {
   String? userIndex;
-  List<String> subjectNames = []; // List to store subject names from Firebase
+  Map<String, String> subjectTypes = {}; // Map to store subject names with their types from Firebase
 
   Future<void> _loadUserIndex() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -27,19 +30,19 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
   void initState() {
     super.initState();
     _loadUserIndex();
-    _fetchSubjectNames(); // Fetch subject names from Firebase
+    _fetchSubjectNamesAndTypes(); // Fetch subject names and types from Firebase
   }
 
-  // Function to fetch subject names from Firebase collection 'sheets'
-  Future<void> _fetchSubjectNames() async {
-    QuerySnapshot querySnapshot =
-    await FirebaseFirestore.instance.collection('sheets').get();
+  // Function to fetch subject names and types from Firebase collection 'sheets'
+  Future<void> _fetchSubjectNamesAndTypes() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('sheets').get();
 
     setState(() {
-      // Extract the subject names and store them in the subjectNames list
-      subjectNames = querySnapshot.docs
-          .map((doc) => doc['name'].toString().toLowerCase())
-          .toList();
+      // Extract the subject names and their types and store them in the subjectTypes map
+      subjectTypes = {
+        for (var doc in querySnapshot.docs)
+          doc['name'].toString().toLowerCase(): doc['type'].toString().toLowerCase(),
+      };
     });
   }
 
@@ -48,17 +51,16 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
   final ChatUser geminiUser = ChatUser(
     id: 'bot',
     firstName: 'Futurex',
-    profileImage:
-    'https://pbs.twimg.com/profile_images/1182918083641593856/VlcETqrt_400x400.jpg', // Optional: Gemini's avatar
+    profileImage: 'https://pbs.twimg.com/profile_images/1182918083641593856/VlcETqrt_400x400.jpg',
   );
 
-  final ScrollController _scrollController = ScrollController(); // ScrollController
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0E21), // Dark theme color
+        backgroundColor: const Color(0xFF0A0E21),
         centerTitle: true,
         leading: IconButton(
           onPressed: () {
@@ -72,17 +74,15 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
         ),
       ),
       body: Container(
-        color: const Color(0xFF0A0E21), // Dark background color
+        color: const Color(0xFF0A0E21),
         child: DashChat(
           currentUser: currentUser,
           messages: messages,
           inputOptions: InputOptions(
-            inputTextStyle: TextStyle(
-              color: Colors.white, // Input text color to white
-            ),
+            inputTextStyle: TextStyle(color: Colors.white),
             inputDecoration: InputDecoration(
               filled: true,
-              fillColor: const Color(0xFF141A2E), // Input background color
+              fillColor: const Color(0xFF141A2E),
               hintText: 'Type a message...',
               hintStyle: const TextStyle(color: Colors.white70),
               border: OutlineInputBorder(
@@ -94,21 +94,18 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
           messageOptions: MessageOptions(
             currentUserTextColor: Colors.white,
             textColor: Colors.white,
-            currentUserContainerColor: const Color(0xFF1D1E33), // Current user bubble color
-            containerColor: const Color(0xFF141A2E), // Bot bubble color
+            currentUserContainerColor: const Color(0xFF1D1E33),
+            containerColor: const Color(0xFF141A2E),
           ),
           onSend: (ChatMessage message) async {
-            // Add user message to the chat
             setState(() {
               messages = [message, ...messages];
             });
 
-            _scrollToBottom(); // Scroll to bottom after sending
+            _scrollToBottom();
 
-            // Send message to Flask backend and get response
             String response = await sendMessageToFlask(message.text);
 
-            // Add Gemini's response to the chat
             setState(() {
               messages = [
                 ChatMessage(
@@ -120,13 +117,11 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
               ];
             });
 
-            _scrollToBottom(); // Scroll to bottom after receiving response
+            _scrollToBottom();
 
-            // Check if the message contains any subject name from the 'sheets' collection
             String? detectedSubject = _detectSubjectInMessage(message.text);
 
             if (detectedSubject != null) {
-              // Show the bottom alert box with the detected subject name after a 5-second delay
               Future.delayed(Duration(seconds: 5), () {
                 _showSubjectBottomSheet(context, detectedSubject);
               });
@@ -137,43 +132,49 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
     );
   }
 
-  // Function to detect if the message contains any subject name
   String? _detectSubjectInMessage(String message) {
-    for (String subject in subjectNames) {
+    for (String subject in subjectTypes.keys) {
       if (message.toLowerCase().contains(subject)) {
         return subject;
       }
     }
-    return null; // No subject detected
+    return null;
   }
 
-  // Function to show a bottom sheet with the detected subject name
   void _showSubjectBottomSheet(BuildContext context, String subjectName) {
+    String? subjectType = subjectTypes[subjectName];
+
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Curved edges
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
         return Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF0A0E21), // Dark background color
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Curved edges
+            color: const Color(0xFF0A0E21),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           height: 200,
           child: Center(
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // Green button color
+                backgroundColor: Colors.green,
               ),
               onPressed: () {
-                // Navigate to the subjects page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SubjectsPage(subjectName)),
-                );
+                if (subjectType == 'sheets') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SubjectsPage(subjectName)),
+                  );
+                } else if (subjectType == 'instruction') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Instruction(subjectname: subjectName,)),
+                  );
+                }
               },
-              child: Text('Go to $subjectName', style: TextStyle(color: Colors.white),), // Update button text with subject name
+              child: Text('Go to $subjectName', style: TextStyle(color: Colors.white)),
             ),
           ),
         );
@@ -181,7 +182,6 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
     );
   }
 
-  // Function to scroll to the bottom of the chat
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -190,19 +190,17 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
     });
   }
 
-  // Function to get flask data or backend
   Future<String> sendMessageToFlask(String userMessage) async {
     final response = await http.post(
-      Uri.parse('https://8c15-154-177-195-39.ngrok-free.app/ask'), // Replace with your Flask backend URL
+      Uri.parse('https://8c15-154-177-195-39.ngrok-free.app/ask'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'question': userMessage,
-        'index': '$userIndex', // Provide the user's student ID if needed
+        'index': '$userIndex',
       }),
     );
 
     if (response.statusCode == 200) {
-      // Parse the response from the Flask chatbot
       final responseData = jsonDecode(response.body);
       return responseData['answer'];
     } else {
@@ -210,5 +208,3 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
     }
   }
 }
-
-// Dummy page for subjects
