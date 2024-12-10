@@ -22,7 +22,9 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
   Future<void> _loadUserIndex() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      userIndex = prefs.getString('studentIndex'); // Assuming 'studentIndex' is the key
+      userIndex = prefs.getString('studentIndex');
+      print(userIndex);
+      // Assuming 'studentIndex' is the key
     });
   }
 
@@ -162,7 +164,7 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
                 backgroundColor: Colors.green,
               ),
               onPressed: () {
-                if (subjectType == 'sheets') {
+                if (subjectType == 'sheet') {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => SubjectsPage(subjectName)),
@@ -192,11 +194,14 @@ class _AssistanceChatbotState extends State<AssistanceChatbot> {
 
   Future<String> sendMessageToFlask(String userMessage) async {
     final response = await http.post(
-      Uri.parse('https://8c15-154-177-195-39.ngrok-free.app/ask'),
+      Uri.parse('https://d37b-156-196-59-174.ngrok-free.app/ask'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'question': userMessage,
+
         'index': '$userIndex',
+
+
       }),
     );
 
